@@ -16,7 +16,7 @@ Small set up for a database and server to allow users to upload images, edit the
 * Sequelize
 * Multer
 
-### Other Depedencies
+### Other Dependencies
 * bcryptjs
 * jsonwebtoken
 * body-parser
