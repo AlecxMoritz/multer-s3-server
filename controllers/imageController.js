@@ -24,6 +24,7 @@ router.post('/upload', validateSession, upload.single('image'), (req, res) => {
     Image.create({
         path: req.file.path,
         owner_id: req.user.id,
+        posted_by: req.user.username
     })
         .then(successData => res.status(200).json({ successData }))
         .catch(err => res.status(500).json({ error: err }))

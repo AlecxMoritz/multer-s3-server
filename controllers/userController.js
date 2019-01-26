@@ -2,6 +2,51 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../db').import('../models/user');
+const validateSession = require('../middleware/validate-session');
+
+router.get('/me', validateSession, (req, res) => {
+    User.findOne({
+        where: {
+            id: req.user.id
+        }
+    })
+    .then(
+        findSuccess = user => {
+            res.status(200).json({
+                username: user.username,
+                bio: user.bio,
+                status: user.status
+            });
+        },
+
+        findError = err => {
+            res.status(500).json(err)
+        }
+    )
+})
+
+router.put('/profile', validateSession, (req, res) => {
+    let reUser = req.body.user
+    User.update({
+        // username: reUser.username,
+        bio: reUser.bio,
+        status: reUser.status
+    },
+    {
+        where: {
+            id: req.user.id
+        }
+    })
+    .then(
+        updateSuccess = recordsChanges => {
+            res.status(200).json(recordsChanges);
+        },
+
+        updateError = err => {
+            res.status(500).json(err);
+        }
+    )
+})
 
 router.post('/signup', (req, res) => {
     let reqUser = req.body.user;
@@ -13,26 +58,26 @@ router.post('/signup', (req, res) => {
         bio: "",
         status: ""
     })
-    .then(
-        createSuccess = user => {
-            let token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 });
-            res.status(200).json({ user: user, sessionToken: token, message: 'User created' });
-        },
+        .then(
+            createSuccess = user => {
+                let token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 });
+                res.status(200).json({ user: user, sessionToken: token, message: 'User created' });
+            },
 
-        createError = err => {
-            res.status(500).json({ error: err });
-        }
-    )
+            createError = err => {
+                res.status(500).json({ error: err });
+            }
+        )
 })
 
 router.post('/signin', (req, res) => {
     let reqUser = req.body.user;
 
-    User.findOne({ where: { username: reqUser.username }})
-        .then(function(user) {
-            if(user) {
+    User.findOne({ where: { username: reqUser.username } })
+        .then(function (user) {
+            if (user) {
                 bcrypt.compare(reqUser.password, user.passwordHash, (err, matches) => {
-                    if(matches) {
+                    if (matches) {
                         let token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 });
                         res.status(200).json({
                             user: user,
@@ -45,10 +90,10 @@ router.post('/signin', (req, res) => {
                 res.status(400).json({ error: 'Username or password incorrect' });
             }
         },
-        
-        function(err) {
-            res.status(500).json({ error: 'Username or password incorrect'})
-        });
+
+            function (err) {
+                res.status(500).json({ error: 'Username or password incorrect' })
+            });
 })
 
 module.exports = router;
