@@ -8,6 +8,11 @@ module.exports = (sequelize, DataTypes) => {
         owner_id: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+
+        votes: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
         }
     })
 

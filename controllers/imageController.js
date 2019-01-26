@@ -75,7 +75,8 @@ router.get('/:id', (req, res) => {
 
 router.put('/:id', validateSession, upload.single('image'), (req, res) => {
     Image.update({
-        path: req.file.path
+        path: req.file.path,
+        votes: 0
     },
         {
             where: {
@@ -104,5 +105,42 @@ router.delete('/:id', validateSession, (req, res) => {
             res.status(500).json({ error: err });
         });
 });
+
+router.put('/up/:id', (req, res) => {
+    Image.findOne({ where: { id: req.params.id }})
+    .then(image => {
+        let newVotes = image.votes + 1;
+        Image.update({
+            votes: newVotes
+        }, 
+        {
+            where: {
+                id: req.params.id
+            }
+        })
+    })
+    .then(updateData => res.status(200).send('Vote recorded'))
+    .catch(err => res.status(500).json(err))
+})
+
+router.put('/down/:id', (req, res) => {
+    let currentImage = Image.findOne({ where: { id: req.params.id }})
+    .then(image => {
+        let newVotes = image.votes - 1;
+        newVotes < 0 ? newVotes = 0 : newVotes = newVotes;
+        Image.update({
+            votes: newVotes
+        }, 
+        {
+            where: {
+                id: req.params.id
+            }
+        })
+    })
+    .then(data => res.status(200).send('Vote recorded'))
+    .catch(err => res.status(500).send(err))
+})
+
+
 
 module.exports = router;
