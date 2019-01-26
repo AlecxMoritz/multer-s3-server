@@ -4,7 +4,6 @@ const multer = require('multer');
 const path = require('path');
 const validateSession = require('../middleware/validate-session');
 
-
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './uploads/')
@@ -144,7 +143,5 @@ router.put('/down/:id', (req, res) => {
     .then(data => res.status(200).send('Vote recorded'))
     .catch(err => res.status(500).send(err))
 })
-
-
 
 module.exports = router;
