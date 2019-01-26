@@ -51,7 +51,11 @@ router.get('/mine', validateSession, (req, res) => {
 })
 
 router.get('/all', (req, res) => {
-    Image.findAll()
+    Image.findAll({
+        order: [
+            ['id', 'DESC']
+        ]
+    })
         .then(images => {
             res.status(200).json({ images })
         })
