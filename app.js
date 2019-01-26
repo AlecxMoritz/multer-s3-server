@@ -4,7 +4,7 @@ const sequelize = require('./db');
 const bodyParser = require('body-parser')
 const app = express();
 
-sequelize.sync();
+sequelize.sync({force: true});
 app.use(require('./middleware/headers'));
 app.use(bodyParser.json());
 app.use('/users', require('./controllers/userController'))
