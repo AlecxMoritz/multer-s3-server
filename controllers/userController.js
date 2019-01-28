@@ -66,6 +66,7 @@ router.post('/signup', (req, res) => {
 
             createError = err => {
                 res.status(500).json({ error: err });
+                console.log(err);
             }
         )
 })
@@ -93,6 +94,7 @@ router.post('/signin', (req, res) => {
 
             function (err) {
                 res.status(500).json({ error: 'Username or password incorrect' })
+                console.log(err);
             });
 })
 
