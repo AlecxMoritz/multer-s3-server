@@ -27,6 +27,7 @@ router.get('/me', validateSession, (req, res) => {
 
 router.put('/profile', validateSession, (req, res) => {
     let reUser = req.body.user
+    console.log(req.body.user);
     User.update({
         // username: reUser.username,
         bio: reUser.bio,
@@ -50,7 +51,7 @@ router.put('/profile', validateSession, (req, res) => {
 
 router.post('/signup', (req, res) => {
     let reqUser = req.body.user;
-
+    console.log(req.body);
     User.create({
         username: reqUser.username,
         passwordHash: bcrypt.hashSync(reqUser.password),
