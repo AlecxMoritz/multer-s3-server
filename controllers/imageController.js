@@ -27,7 +27,10 @@ router.post('/upload', validateSession, upload.single('image'), (req, res) => {
         posted_by: req.user.username
     })
         .then(successData => res.status(200).json({ successData }))
-        .catch(err => res.status(500).json({ error: err }))
+        .catch(err => {
+            res.status(500).json({ error: err })
+            console.log(err);
+        })
 });
 
 router.get('/mine', validateSession, (req, res) => {
