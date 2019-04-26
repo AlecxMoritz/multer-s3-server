@@ -10,7 +10,6 @@ const fs = require('fs');
 const AWS = require('aws-sdk');
 
 //  ! Set up s3
-// AWS.config.loadFromPath('./s3_config.json');
 var s3 = new AWS.S3({
     accessKeyId :  process.env.ACCESS_KEY_ID,
     secretAccessKey: process.env.SECRET_ACCESS_KEY,
