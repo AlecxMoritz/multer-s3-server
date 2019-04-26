@@ -4,25 +4,32 @@ const multer = require('multer');
 const path = require('path');
 const validateSession = require('../middleware/validate-session');
 
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './uploads/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-});
+// ! new dependencies
+const multerS3 = require('multer-s3');
+const fs = require('fs');
+const AWS = require('aws-sdk');
 
-var upload = multer({ storage: storage, fieldSize: 1000 });
+//  ! Set up s3
+AWS.config.loadFromPath('./s3_config.json');
+var s3 = new AWS.S3();
 
-router.get('/', (req, res) => {
-    res.json({ message: "test passed" })
+var upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: 'am-image-db',
+        metadata: function (req, file, cb) {
+            cb(null, { fieldName: file.fieldname });
+        },
+        key: function (req, file, cb) {
+            cb(null, Date.now() + '-' + file.originalname)
+        }
+    })
 })
 
+
 router.post('/upload', validateSession, upload.single('image'), (req, res) => {
-    options = { multi: true };
     Image.create({
-        path: req.file.path,
+        location: req.file.location,
         owner_id: req.user.id,
         posted_by: req.user.username
     })
@@ -73,7 +80,7 @@ router.get('/:id', (req, res) => {
     })
         .then(foundImage => {
             // res.status(200);
-            res.sendFile(path.resolve('./' + foundImage.path))
+            res.status(200).json(foundImage);
         })
         .catch(err => {
             res.status(500).json(err);
@@ -82,7 +89,7 @@ router.get('/:id', (req, res) => {
 
 router.put('/:id', validateSession, upload.single('image'), (req, res) => {
     Image.update({
-        path: req.file.path,
+        location: req.file.location,
         votes: 0
     },
         {
